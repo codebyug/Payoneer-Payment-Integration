@@ -1,0 +1,16 @@
+# Payoneer Payment API Integration
+Integration of payoneer payment API using NodeJs
+
+This is a Node JS application
+
+run 
+- npm i to install required dependencies
+- npm start to start the server
+
+if the server is started on port 8181, use http://localhost:8181/docs/ to see the avialable endpoints.
+
+Third party endpoints are configured in config.js and can be changed accordingly.
+
+There 2 endpoitns right now
+- GET look up payment payout info
+- POST Initiate a payout request
