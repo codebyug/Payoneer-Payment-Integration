@@ -1,0 +1,44 @@
+const config = require('../config')
+const { sendRequest } = require('../util')
+
+const FIVE_MINUTES_IN_MS = 300000 // 5 * 60 * 1000
+
+class AuthService {
+  // This method is used to check if the token is expired
+  isTokenExpired (token) {
+    console.log(`Token expires in ${(token.expiration - Date.now()) / 1000}s`)
+    return (token.expiration - Date.now()) < FIVE_MINUTES_IN_MS
+  }
+
+  // This method is used to get the auth-token from the authentication api and cache it
+  async getToken () {
+    if (this.accessToken && !this.isTokenExpired(this.accessToken)) {
+      console.log('reusing token')
+      return this.accessToken.access_token
+    } else {
+      console.log('getting new token')
+      const newToken = await this.getNewToken()
+      this.accessToken = {
+        access_token: newToken.access_token,
+        expiration: Date.now() + (newToken.expires_in * 1000)
+      }
+      return newToken.access_token
+    }
+  }
+
+  // This method is used to get the auth-token from the authentication api
+  async getNewToken () {
+    const response = await sendRequest(config.authenticationApi, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64')}`
+      },
+      body: 'grant_type=client_credentials&scope=read write'
+    })
+    console.log(`[getNewToken] response: ${JSON.stringify(response)}`)
+    return response
+  }
+}
+
+module.exports = new AuthService()

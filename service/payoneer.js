@@ -1,34 +1,60 @@
-const fetch = require('node-fetch')
+const currency = require('currency.js')
 const config = require('../config')
-
+const auth = require('./authToken')
+const { sendRequest } = require('../util')
 class PayoutService {
   constructor () {
-    this.url = config.payoutApi
     this.headers = {
       'Content-Type': 'application/json',
-      accept: 'application/json',
-      Authorization: `Bearer ${config.payoutApiToken}`
+      accept: 'application/json'
     }
   }
 
+  /**
+   * This method is used to check the status of a payout
+   * @param {*} clientRefId
+   * @returns PAYOUT STATUS
+   */
   async payoutStatus (clientRefId) {
-    const response = await fetch(`${this.url}/${clientRefId}`, {
+    const url = `${config.payoneerApi}/v4/programs/${config.programId}/payouts/${clientRefId}/status`
+    const authToken = await auth.getToken()
+    console.log(`[payoutStatus] authToken: ${authToken}`)
+    const response = await sendRequest(url, {
       method: 'GET',
-      headers: this.headers
+      headers: {
+        ...this.headers,
+        Authorization: `Bearer ${authToken}`
+      }
     })
-    return response.json()
+    return response
   }
 
+  /**
+   * This method is used to initiate a payout
+   * @param {*} request for payout
+   * @returns mass payout response
+   */
   async initiatePayout (req) {
+    const url = `${config.payoneerApi}/v4/programs/${config.programId}/masspayouts`
+    const authToken = await auth.getToken()
     const payload = this.framePayoutRequest(req)
-    const response = await fetch(this.url, {
+    const response = await sendRequest(url, {
       method: 'POST',
-      headers: this.headers,
+      headers: {
+        ...this.headers,
+        Authorization: `Bearer ${authToken}`
+      },
       body: JSON.stringify(payload)
     })
-    return response.json()
+    console.log(`[payout] response: ${JSON.stringify(response)}`)
+    return response
   }
 
+  /**
+   * This method is used to frame the payout request
+   * @param {*} req
+   * @returns Array of payments for the payout request
+   */
   framePayoutRequest (req) {
     const { payouts } = req.body
     const payments = []
@@ -40,16 +66,22 @@ class PayoutService {
     }
   }
 
+  /**
+   * This method is used to frame the payee payout info for the payout request
+   * @param {*} payee object
+   *  @returns the request object to initiate payout
+   */
   payeePayoutInfo (payee) {
-    const { payeeId, amount, currency, description } = payee
+    const { payeeId, amount, paymentCurrency, description } = payee
     const referenceId = `skilldizer-${payeeId}-${new Date().toISOString()}`
     return {
       payee_id: payeeId,
-      amount,
-      currency,
+      amount: currency(amount).value,
+      currency: paymentCurrency || 'USD',
       description: description || referenceId,
       client_reference_id: referenceId
     }
   }
 }
+
 module.exports = new PayoutService()

@@ -11,6 +11,6 @@ if the server is started on port 8181, use http://localhost:8181/docs/ to see th
 
 Third party endpoints are configured in config.js and can be changed accordingly.
 
-There 2 endpoitns right now
-- GET look up payment payout info
-- POST Initiate a payout request
+There 2 endpoints
+- GET /payout/{clientRefId} look up payment payout info
+- POST /payout Initiate a payout request

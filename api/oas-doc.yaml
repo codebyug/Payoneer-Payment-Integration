@@ -34,6 +34,8 @@ paths:
           description: Internal Server Errror
         '400':
           description: Invalid Request
+        '401':
+          description: Unauthorized
         '404':
           description: Not Found
   /payout:
