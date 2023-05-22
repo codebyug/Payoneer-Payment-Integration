@@ -1,7 +1,7 @@
 {
-  "name": "payoneer-payout-integration",
+  "name": "payoneer-api-integration",
   "version": "1.0.0",
-  "description": "API to handle Payoneer Payout",
+  "description": "API to handle Payoneer Integration",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -10,7 +10,7 @@
     "standard::fix": "standard --fix"
   },
   "keywords": [
-    "payoneer-payout"
+    "payoneer-api"
   ],
   "author": "codebyug",
   "license": "ISC",
