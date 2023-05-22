@@ -12,7 +12,7 @@
   "keywords": [
     "payoneer-payout"
   ],
-  "author": "ugdeepan",
+  "author": "codebyug",
   "license": "ISC",
   "dependencies": {
     "chai": "^4.3.7",
